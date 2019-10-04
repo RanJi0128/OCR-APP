@@ -17,10 +17,19 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.io.*;
+
+
+import com.googlecode.leptonica.android.Pixa;
 import com.googlecode.tesseract.android.TessBaseAPI;
+
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap;
 import android.os.Environment;
+import android.net.Uri;
+import android.widget.Toast;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
+//import android.content.ActivityNotFoundException;
 
 
 
@@ -28,30 +37,22 @@ public class ConvertText {
 
     private static Activity m_ActivityInstance;
 
+    public static final int REQUEST_CAPTURE_IMAGE  = 1;
+    public static String inputFileName;
+    private static Uri outputImgUri;
+
     public static void Init(Activity ActivityInstance)
     {
         m_ActivityInstance = ActivityInstance;
 
     }
-    public static String ReadDataConvertText(Context context,InputStream fileStream)
+
+    public static String ReadDataConvertText(Context context,String filename)
     {
-           Dexter.withActivity(m_ActivityInstance).withPermissions(
-                                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                    Manifest.permission.INTERNET,
-                                    Manifest.permission.ACCESS_WIFI_STATE,
-                                    Manifest.permission.ACCESS_NETWORK_STATE
-                            ).withListener(new MultiplePermissionsListener() {
-                        @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        }
-                        @Override public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {}
-                    }).check();
-
-
             try {
                      BitmapFactory.Options options = new BitmapFactory.Options();
                      options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                     Bitmap bitmap = BitmapFactory.decodeStream(fileStream,null, options);
+                     Bitmap bitmap = BitmapFactory.decodeFile(filename, options);
 
                      File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/tesseract/tessdata");
                          if(!f.exists()){
@@ -75,14 +76,65 @@ public class ConvertText {
                      tessBaseApi.setImage(bitmap);
                      String extractedText = tessBaseApi.getUTF8Text();
                      tessBaseApi.end();
-
                      return extractedText;
+
                  }
              catch (IOException e) {
                             e.printStackTrace();
                  }
 
              return "No Read Image";
+
+    }
+    public static void SetPermission()
+    {
+        Dexter.withActivity(m_ActivityInstance).withPermissions(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.INTERNET,
+                                Manifest.permission.ACCESS_WIFI_STATE,
+                                Manifest.permission.ACCESS_NETWORK_STATE,
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.CAMERA
+                         ).withListener(new MultiplePermissionsListener() {
+                     @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
+                     }
+                     @Override public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {}
+                    }).check();
+    }
+    public static String OpenCamera(Context context)
+    {
+
+        try {
+
+            String filepath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/"+m_ActivityInstance.getPackageName()+"/imageData";
+            File pictureSaveFolderPath = new File(filepath);
+            if(!pictureSaveFolderPath.exists()){
+                   pictureSaveFolderPath.mkdirs();
+            }
+
+            String imageFileName = "outputImage.jpg";   //System.currentTimeMillis()
+            File outputImageFile = new File(filepath, imageFileName);
+
+            if (outputImageFile.exists()) {
+                outputImageFile.delete();
+            }
+            outputImgUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", outputImageFile);
+            inputFileName = filepath+"/"+imageFileName;
+            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputImgUri);
+            m_ActivityInstance.startActivityForResult(cameraIntent, REQUEST_CAPTURE_IMAGE );
+            cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            return "ReadDataConvertText(context,inputFileName)";
+        }
+        catch (Exception  e) {
+            String errorMessage = "Whoops - your device doesn't support capturing images!";
+            Toast toast = Toast.makeText(m_ActivityInstance, errorMessage, Toast.LENGTH_SHORT);
+            toast.show();
+        }
+      return "No Camera";
 
     }
 

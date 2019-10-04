@@ -7,6 +7,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
       height = size.height();
 
       interface();
+
+      QAndroidJniObject::callStaticMethod<void>("com/jni/camera/ConvertText", "SetPermission", "()V");
 }
 void MainWindow::interface()
 {
@@ -22,16 +24,47 @@ void MainWindow::interface()
 
    exitBtn = new QPushButton("Exit",this);
    exitBtn->setGeometry(width*75/100,height*5/100,width*25/100,height*5/100);
-   exitBtn->setFont(QFont("Times", titleLabel->height()*25/100, QFont::Bold));
+   exitBtn->setFont(QFont("Times", titleLabel->height()*20/100, QFont::Bold));
+   exitBtn->setStyleSheet("QPushButton{"
+                             "color : #14428b;"
+                              "background-color: #e3edfb;"
+                              "border-style: outset;"
+                              "border-width: 2px;"
+                              "border-color: #e3edfb;"
+                              "padding: 6px;}"
+                          "QPushButton:pressed {"
+                              "color : #8fd7f1;"
+                              "border-style: inset;"
+                              "border-color: #8fd7f1;}");
    connect(exitBtn,SIGNAL(clicked()),qApp,SLOT(quit()));
 
-   openCamera();
-    //androidMethodCall();
+   startBtn = new QPushButton("Start",this);
+   startBtn->setGeometry(0,height*5/100,width*25/100,height*5/100);
+   startBtn->setFont(QFont("Times", titleLabel->height()*20/100, QFont::Bold));
+   startBtn->setStyleSheet("QPushButton{"
+                             "color : #14428b;"
+                              "background-color: #e3edfb;"
+                              "border-style: outset;"
+                              "border-width: 2px;"
+                              "border-color: #e3edfb;"
+                              "padding: 6px;}"
+                          "QPushButton:pressed {"
+                              "color : #8fd7f1;"
+                              "border-style: inset;"
+                              "border-color: #8fd7f1;}");
+   connect(startBtn,SIGNAL(clicked()),this,SLOT(cameraStart()));
+
+
+}
+void MainWindow::cameraStart()
+{
+   androidMethodCall();
 }
 void MainWindow::androidMethodCall()
 {
 
-   QAndroidJniObject string = QAndroidJniObject::callStaticObjectMethod("com/jni/camera/ConvertText", "ReadDataConvertText", "(Landroid/content/Context;)Ljava/lang/String;",QtAndroid::androidContext().object<jobject>());
+   QAndroidJniObject string = QAndroidJniObject::callStaticObjectMethod("com/jni/camera/ConvertText", "OpenCamera", "(Landroid/content/Context;)Ljava/lang/String;",QtAndroid::androidContext().object<jobject>());
+
    QString text = string.toString();
 
    textShow->setText(text);
@@ -39,17 +72,4 @@ void MainWindow::androidMethodCall()
 
 
 }
-void MainWindow::openCamera()
-{
-    camera = new QCamera;
 
-    viewfinder = new QCameraViewfinder();
-    viewfinder->show();
-
-    camera->setViewfinder(viewfinder);
-
-    imageCapture = new QCameraImageCapture(camera);
-
-    camera->setCaptureMode(QCamera::CaptureStillImage);
-    camera->start();
-}

@@ -1,7 +1,6 @@
-QT += core widgets androidextras multimediawidgets
+QT += core widgets androidextras
 
-CONFIG += c++11
-
+CONFIG += c++11 console
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -15,31 +14,26 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += main.cpp \
-    mainwindow.cpp
+        mainwindow.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+HEADERS += include.h \
+    mainwindow.h
+
 DISTFILES += android/AndroidManifest.xml \
-    android/assets/capture.jpg \
-    android/assets/image.jpg \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.jar \
     android/gradle/wrapper/gradle-wrapper.properties \
     android/gradlew \
     android/gradlew.bat \
     android/res/values/libs.xml \
+    android/res/xml/provider_paths.xml \
     android/src/com/jni/camera/AppActivity.java \
     android/src/com/jni/camera/ConvertText.java
 
-contains(ANDROID_TARGET_ARCH,x86) {
-    ANDROID_PACKAGE_SOURCE_DIR = \
-        $$PWD/android
-}
-
-HEADERS += \
-    include.h \
-    mainwindow.h
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 

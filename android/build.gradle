@@ -19,7 +19,7 @@ apply plugin: 'com.android.application'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation 'com.karumi:dexter:5.0.0'
-    implementation 'com.rmtheis:tess-two:9.0.0'
+    implementation 'com.rmtheis:tess-two:8.0.0'
 }
 
 android {
@@ -37,7 +37,9 @@ android {
      *******************************************************/
 
     compileSdkVersion androidCompileSdkVersion.toInteger()
+
     buildToolsVersion androidBuildToolsVersion
+
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'

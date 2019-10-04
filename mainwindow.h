@@ -15,18 +15,15 @@ public:
     QTextEdit *textShow;
     QLabel *titleLabel;
     QPushButton *exitBtn;
-
-    QCamera *camera;
-    QCameraViewfinder *viewfinder;
-    QCameraImageCapture *imageCapture;
-
+    QPushButton *startBtn;
 
     void interface();
     void androidMethodCall();
-    void openCamera();
+
 signals:
 
 public slots:
+    void cameraStart();
 };
 
 #endif // MAINWINDOW_H

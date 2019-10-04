@@ -10,8 +10,5 @@
 #include <QPushButton>
 #include <QtAndroidExtras>
 #include <QAndroidJniObject>
-#include <QCamera>
-#include <QCameraViewfinder>
-#include <QCameraImageCapture>
 
 #endif // INCLUDE_H
