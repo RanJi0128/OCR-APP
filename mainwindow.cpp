@@ -53,6 +53,7 @@ void MainWindow::interface()
                               "border-style: inset;"
                               "border-color: #8fd7f1;}");
    connect(startBtn,SIGNAL(clicked()),this,SLOT(cameraStart()));
+   connect(this,SIGNAL(receiveKey()),this,SLOT(setKeyText()));
 
 
 }
@@ -63,13 +64,18 @@ void MainWindow::cameraStart()
 void MainWindow::androidMethodCall()
 {
 
-   QAndroidJniObject string = QAndroidJniObject::callStaticObjectMethod("com/jni/camera/ConvertText", "OpenCamera", "(Landroid/content/Context;)Ljava/lang/String;",QtAndroid::androidContext().object<jobject>());
+   QAndroidJniObject::callStaticMethod<void>("com/jni/camera/ConvertText", "OpenCamera", "(Landroid/content/Context;)V",QtAndroid::androidContext().object<jobject>());
 
-   QString text = string.toString();
+}
+void MainWindow::showKeyText(QString keyStr)
+{
+//
+    keyString=keyStr;
+    emit receiveKey();
 
-   textShow->setText(text);
-
-
-
+}
+void MainWindow::setKeyText()
+{
+    textShow->setText(keyString);
 }
 

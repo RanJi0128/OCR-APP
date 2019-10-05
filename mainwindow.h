@@ -19,11 +19,16 @@ public:
 
     void interface();
     void androidMethodCall();
+    void showKeyText(QString keyStr);
+
+    QString keyString;
 
 signals:
 
+    void receiveKey();
 public slots:
     void cameraStart();
+    void setKeyText();
 };
 
 #endif // MAINWINDOW_H
